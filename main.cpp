@@ -5,9 +5,12 @@ int main(void) {
 
     Campo campo;
     Input input;
-    GRAVITA gravita = GRAVITA::DESTRA;
-    COORD posizione = {2, 2};
     short movimento;
+    std::vector<GRAVITA> gravita;
+    std::vector<COORD> posizione;
+
+    gravita.push_back(GRAVITA::DESTRA);
+    posizione.push_back(COORD{2, 2});
 
     campo.carica_campo("prova.txt");
     campo.inizializza();
@@ -33,23 +36,24 @@ int main(void) {
             if (azione == TipoInput::INVIO) {
                 switch (input.comando()) {
                     case TipoComando::DESTRA:
-                        if (gravita != GRAVITA::SINISTRA) gravita = GRAVITA::DESTRA;
+                        if (gravita.back() != GRAVITA::SINISTRA && gravita.back() != GRAVITA::DESTRA) gravita.push_back(GRAVITA::DESTRA);
                         break;
 
                     case TipoComando::SINISTRA:
-                        if (gravita != GRAVITA::DESTRA) gravita = GRAVITA::SINISTRA;
+                        if (gravita.back() != GRAVITA::DESTRA && gravita.back() != GRAVITA::SINISTRA) gravita.push_back(
+                            GRAVITA::SINISTRA);
                         break;
 
                     case TipoComando::SU:
-                        if (gravita != GRAVITA::GIU) gravita = GRAVITA::SU;
+                        if (gravita.back() != GRAVITA::GIU && gravita.back() != GRAVITA::SU) gravita.push_back(GRAVITA::SU);
                         break;
 
                     case TipoComando::GIU:
-                        if (gravita != GRAVITA::SU) gravita = GRAVITA::GIU;
+                        if (gravita.back() != GRAVITA::SU && gravita.back() != GRAVITA::GIU) gravita.push_back(GRAVITA::GIU);
                         break;
 
                     case TipoComando::SKIP:
-                        movimento = 3;
+                        movimento = 5;
                         goto SKIP;
                         break;
 
@@ -58,75 +62,65 @@ int main(void) {
                 }
             } else if (azione == TipoInput::BACKSPACE) {
 
+                if (posizione.size() > 1) {
 
+                    GRAVITA g2 = static_cast<GRAVITA>((static_cast<int>(gravita.back()) + 2) % 4);
 
-                GRAVITA g2 = static_cast<GRAVITA>((static_cast<int>(gravita) + 2) % 4);
-
-                if (campo.collisione(posizione, g2, movimento) == TipoScritta::COLLISIONE) {
+                    if (campo.collisione(posizione.back(), g2, movimento) == TipoScritta::LIBERO) {
+                        if (gravita.size() > 1) gravita.pop_back();
+                    }
 
                     if (input.stringa.length() > 0) input.stringa.pop_back();
 
-                    campo.set_casella(posizione.Y, posizione.X, ' ', TipoScritta::LIBERO);
-                    posizione_cursore(posizione);
-                    printf(" ");
+                    campo.set_casella(posizione.back().Y, posizione.back().X, ' ', TipoScritta::LIBERO);
+                    posizione_cursore(posizione.back());
+                    campo.stampa(posizione.back().Y, posizione.back().X);
 
-                    // i segni sono invertiti
-                    switch (gravita) {
-                        case GRAVITA::DESTRA:
-                            posizione.X -= movimento;
-                            break;
-
-                        case GRAVITA::SINISTRA:
-                            posizione.X += movimento;
-                            break;
-
-                        case GRAVITA::SU:
-                            posizione.Y += movimento;
-                            break;
-
-                        case GRAVITA::GIU:
-                            posizione.Y -= movimento;
-                            break;
-                    }
+                    posizione.pop_back();
                 }
+
+
+
 
             } else if (input.valido()) {
 
                 SKIP:
 
-                if (campo.collisione(posizione, gravita, movimento) != TipoScritta::LIBERO) {
+                if (campo.collisione(posizione.back(), gravita.back(), movimento) != TipoScritta::LIBERO) {
                     input.stringa.erase(input.stringa.length() - 2, 1);
                     //rendi rosso il carattere?
                 }else {
-                    switch (gravita) {
+                    COORD pos = posizione.back();
+                    switch (gravita.back()) {
                         case GRAVITA::DESTRA:
-                            posizione.X += movimento;
+                            pos.X += movimento;
                             break;
 
                         case GRAVITA::SINISTRA:
-                            posizione.X -= movimento;
+                            pos.X -= movimento;
                             break;
 
                         case GRAVITA::SU:
-                            posizione.Y -= movimento;
+                            pos.Y -= movimento;
                             break;
 
                         case GRAVITA::GIU:
-                            posizione.Y += movimento;
+                            pos.Y += movimento;
                             break;
                     }
+                    posizione.push_back(pos);
                 }
 
-                campo.set_casella(posizione.Y, posizione.X, input.input, TipoScritta::COLLISIONE);
+                campo.set_casella(posizione.back().Y, posizione.back().X, input.input, TipoScritta::COLLISIONE);
 
-                posizione_cursore(posizione);
+                posizione_cursore(posizione.back());
 
-                printf("%c", input.input);
+                campo.stampa(posizione.back().Y, posizione.back().X);
 
             }
 
             // debug della stringa
-            cursore_manuale(1, 20);
+            cursore_manuale(50, 0);
             printf("Stringa: %-*s", static_cast<int>(input.stringa.length()) + 1, input.stringa.c_str());
 
 

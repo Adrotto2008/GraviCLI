@@ -121,10 +121,7 @@ TipoScritta Campo::collisione(COORD posizione, GRAVITA gravita, short movimento)
                 break;
         }
 
-        if (caselle[posizione.Y][posizione.X].tipo != TipoScritta::LIBERO) {
-            return caselle[posizione.Y][posizione.X].tipo;
-        }
-
+        if ((i == 0 || i == movimento - 1) && caselle[posizione.Y][posizione.X].tipo != TipoScritta::LIBERO) return caselle[posizione.Y][posizione.X].tipo;
 
     }
 
