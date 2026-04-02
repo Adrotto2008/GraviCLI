@@ -1,0 +1,53 @@
+# Build / CMake generated files
+build/
+build-*/
+cmake-build-*/
+_deps/
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+build.ninja
+compile_commands.json
+CTestTestfile.cmake
+CPackConfig.cmake
+CPackSourceConfig.cmake
+*.dir/
+
+# Local IDE / editor settings
+.idea/
+.vs/
+.vscode/
+*.iml
+*.user
+*.suo
+*.vcxproj.user
+*.VC.db
+*.opendb
+
+# Local CMake presets
+CMakeUserPresets.json
+
+# Compiled binaries / intermediates
+*.exe
+*.dll
+*.pdb
+*.ilk
+*.obj
+*.o
+*.a
+*.lib
+*.so
+*.dylib
+*.out
+*.app
+
+# Logs / temp files
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+
+# Keep source trees and project files tracked:
+# main.cpp, src/, include/, livelli/, SFML/ and the CMakeLists.txt files.
