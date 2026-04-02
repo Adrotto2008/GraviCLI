@@ -1,6 +1,27 @@
 #include "include/input.hpp"
 #include "include/campo.hpp"
 
+COORD spostamento(short movimento, GRAVITA gravita, COORD pos) {
+    switch (gravita) {
+        case GRAVITA::DESTRA:
+            pos.X += movimento;
+            break;
+
+        case GRAVITA::SINISTRA:
+            pos.X -= movimento;
+            break;
+
+        case GRAVITA::SU:
+            pos.Y -= movimento;
+            break;
+
+        case GRAVITA::GIU:
+            pos.Y += movimento;
+            break;
+    }
+    return pos;
+}
+
 int main(void) {
 
     Campo campo;
@@ -8,6 +29,10 @@ int main(void) {
     short movimento;
     std::vector<GRAVITA> gravita;
     std::vector<COORD> posizione;
+    bool skip = false;
+    bool uscita = false;
+    short movimento_skip = 4;
+    COORD posizione_skip = {};
 
     gravita.push_back(GRAVITA::DESTRA);
     posizione.push_back(COORD{2, 2});
@@ -24,7 +49,7 @@ int main(void) {
     campo.stampa_campo();
 
 
-    while (true) {
+    while (!uscita) {
 
         if (kbhit()){
             input.scan();
@@ -53,8 +78,7 @@ int main(void) {
                         break;
 
                     case TipoComando::SKIP:
-                        movimento = 5;
-                        goto SKIP;
+                        skip = true;
                         break;
 
                     default:
@@ -70,7 +94,7 @@ int main(void) {
                         if (gravita.size() > 1) gravita.pop_back();
                     }
 
-                    if (input.stringa.length() > 0) input.stringa.pop_back();
+                    if (!input.stringa.empty()) input.stringa.pop_back();
 
                     campo.set_casella(posizione.back().Y, posizione.back().X, ' ', TipoScritta::LIBERO);
                     posizione_cursore(posizione.back());
@@ -79,37 +103,37 @@ int main(void) {
                     posizione.pop_back();
                 }
 
+            } else if (azione == TipoInput::DEBUG) {
+                campo.stampa_campo();
+            } else if (azione == TipoInput::ESCI) {
+                uscita = true;
+            }
 
-
-
-            } else if (input.valido()) {
-
-                SKIP:
-
-                if (campo.collisione(posizione.back(), gravita.back(), movimento) != TipoScritta::LIBERO) {
-                    input.stringa.erase(input.stringa.length() - 2, 1);
-                    //rendi rosso il carattere?
+            if (skip) {
+                if (campo.collisione(posizione.back(), gravita.back(), movimento_skip) != TipoScritta::LIBERO) {
+                    //errore
+                    skip = false;
+                    cursore_manuale(50, 1);
+                    printf("aaa");
                 }else {
-                    COORD pos = posizione.back();
-                    switch (gravita.back()) {
-                        case GRAVITA::DESTRA:
-                            pos.X += movimento;
-                            break;
-
-                        case GRAVITA::SINISTRA:
-                            pos.X -= movimento;
-                            break;
-
-                        case GRAVITA::SU:
-                            pos.Y -= movimento;
-                            break;
-
-                        case GRAVITA::GIU:
-                            pos.Y += movimento;
-                            break;
-                    }
-                    posizione.push_back(pos);
+                    posizione_skip = spostamento(movimento_skip - 1, gravita.back(), posizione.back());
                 }
+            }
+
+            if (input.valido()) {
+
+                if (skip) {//aggiusta
+                    posizione.push_back(spostamento(movimento, gravita.back(), posizione_skip));
+                }else {
+                    if (campo.collisione(posizione.back(), gravita.back(), movimento) != TipoScritta::LIBERO) {
+                        input.stringa.erase(input.stringa.length() - 2, 1);
+                        //rendi rosso il carattere?
+                    }else {
+                        posizione.push_back(spostamento(movimento, gravita.back(), posizione.back()));
+                    }
+                }
+
+
 
                 campo.set_casella(posizione.back().Y, posizione.back().X, input.input, TipoScritta::COLLISIONE);
 
@@ -117,14 +141,20 @@ int main(void) {
 
                 campo.stampa(posizione.back().Y, posizione.back().X);
 
-            }
 
-            // debug della stringa
-            cursore_manuale(50, 0);
-            printf("Stringa: %-*s", static_cast<int>(input.stringa.length()) + 1, input.stringa.c_str());
+            skip = false;
+
+            }
 
 
         }
+
+        // debug della stringa
+        cursore_manuale(50, 0);
+        printf("stringa: %-*s", static_cast<int>(input.stringa.length()) + 1, input.stringa.c_str());
+
+
+
 
     }
 

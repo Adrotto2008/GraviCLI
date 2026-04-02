@@ -146,6 +146,7 @@ enum class TipoInput{
     INVIO,
     ESCI,
     BACKSPACE,
+    DEBUG,
     NULLA
 };
 
@@ -167,6 +168,7 @@ extern const std::string COMANDI[NUMERO_COMANDI];
 extern std::array<char, 80> CARATTERI_POSSIBILI;
 extern std::array<char, 1> INVIO;
 extern std::array<char, 2> BACKSPACE;
+extern std::array<char, 1> DEBUG;
 extern std::array<char, 1> ESCI;  
 
 

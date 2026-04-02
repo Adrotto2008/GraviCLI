@@ -86,6 +86,8 @@ void Campo::stampa(short y, short x) {
 }
 
 void Campo::stampa_campo() {
+    pulisci();
+    cursore_manuale(0, 0);
     for (int i = 0; i < MAX_Y; i++) {
         for (int j = 0; j < MAX_X; j++) {
             stampa(i, j);
@@ -100,6 +102,8 @@ void Campo::set_casella(short y, short x, char c, TipoScritta tipo) {
 }
 
 TipoScritta Campo::collisione(COORD posizione, GRAVITA gravita, short movimento) {
+
+    if (movimento == 0) return TipoScritta::COLLISIONE;
 
     for (int i = 0; i < movimento; i++) {
 
@@ -121,9 +125,10 @@ TipoScritta Campo::collisione(COORD posizione, GRAVITA gravita, short movimento)
                 break;
         }
 
-        if ((i == 0 || i == movimento - 1) && caselle[posizione.Y][posizione.X].tipo != TipoScritta::LIBERO) return caselle[posizione.Y][posizione.X].tipo;
+        if ((movimento == 1 || i == movimento - 1) && caselle[posizione.Y][posizione.X].tipo != TipoScritta::LIBERO) return caselle[posizione.Y][posizione.X].tipo;
 
     }
+
 
     return TipoScritta::LIBERO;
 

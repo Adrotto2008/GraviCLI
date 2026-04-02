@@ -15,6 +15,7 @@ public:
     TipoInput invio();
     TipoInput uscita();
     TipoInput cancella();
+    TipoInput debug();
     TipoComando comando();
 
 };

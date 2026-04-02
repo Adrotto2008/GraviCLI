@@ -65,16 +65,21 @@ TipoInput Input::azione(){
     }
 
     if(cancella() == TipoInput::BACKSPACE){
-        return TipoInput::BACKSPACE;
+        return cancella();
     }
 
     if(uscita() != TipoInput::NULLA){
         return uscita();
     }
 
+    if (debug() != TipoInput::NULLA){
+        return debug();
+    }
+
     if (!valido()) {
         return TipoInput::NULLA;
     }
+
 
     stringa += input;
 
@@ -109,6 +114,15 @@ TipoInput Input::cancella(){
     for(char c : BACKSPACE){
         if(input == c){
             return TipoInput::BACKSPACE;
+        }
+    }
+    return TipoInput::NULLA;
+}
+
+TipoInput Input::debug(){
+    for(char c : DEBUG){
+        if(input == c){
+            return TipoInput::DEBUG;
         }
     }
     return TipoInput::NULLA;

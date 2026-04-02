@@ -18,5 +18,6 @@ const std::string COMANDI[NUMERO_COMANDI] = {"su", "giu", "sinistra", "destra", 
 
 std::array<char, 1> INVIO = {13};
 std::array<char, 2> BACKSPACE = {'\b', 127};
-std::array<char, 1> ESCI = {27};
+std::array<char, 1> DEBUG = {'+'};
+std::array<char, 1> ESCI = {'-'};
 
