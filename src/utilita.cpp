@@ -1,6 +1,10 @@
 #include "../include/utilita.hpp"
 #include "../include/campo.hpp"
 
+#ifdef __linux__
+#include <sys/ioctl.h>
+#endif
+
 using namespace std;
 using namespace chrono;
 using namespace chrono_literals;
@@ -207,6 +211,74 @@ void countdown_caduta(int tempo) {
 }
 
 #endif
+
+short lunghezza_terminale_x() {
+#ifdef __linux__
+    winsize ws{};
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_col > 0) {
+        return static_cast<short>(ws.ws_col);
+    }
+
+    const char* colonne = std::getenv("COLUMNS");
+    if (colonne != nullptr) {
+        int valore = std::atoi(colonne);
+        if (valore > 0) return static_cast<short>(valore);
+    }
+
+    return 80;
+#else
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hConsole != INVALID_HANDLE_VALUE && hConsole != nullptr) {
+        CONSOLE_SCREEN_BUFFER_INFO csbi{};
+        if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+            int larghezza = static_cast<int>(csbi.srWindow.Right - csbi.srWindow.Left + 1);
+            if (larghezza > 0) return static_cast<short>(larghezza);
+        }
+    }
+
+    const char* colonne = std::getenv("COLUMNS");
+    if (colonne != nullptr) {
+        int valore = std::atoi(colonne);
+        if (valore > 0) return static_cast<short>(valore);
+    }
+
+    return 80;
+#endif
+}
+
+short lunghezza_terminale_y() {
+#ifdef __linux__
+    winsize ws{};
+    if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_row > 0) {
+        return static_cast<short>(ws.ws_row);
+    }
+
+    const char* righe = std::getenv("LINES");
+    if (righe != nullptr) {
+        int valore = std::atoi(righe);
+        if (valore > 0) return static_cast<short>(valore);
+    }
+
+    return 24;
+#else
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    if (hConsole != INVALID_HANDLE_VALUE && hConsole != nullptr) {
+        CONSOLE_SCREEN_BUFFER_INFO csbi{};
+        if (GetConsoleScreenBufferInfo(hConsole, &csbi)) {
+            int altezza = static_cast<int>(csbi.srWindow.Bottom - csbi.srWindow.Top + 1);
+            if (altezza > 0) return static_cast<short>(altezza);
+        }
+    }
+
+    const char* righe = std::getenv("LINES");
+    if (righe != nullptr) {
+        int valore = std::atoi(righe);
+        if (valore > 0) return static_cast<short>(valore);
+    }
+
+    return 24;
+#endif
+}
 
 // ---------------- Random ----------------
 

@@ -115,8 +115,6 @@ int main(void) {
             if (campo.collisione(posizione.back(), gravita.back(), movimento_skip) != TipoScritta::LIBERO) {
                 //errore
                 skip = false;
-                cursore_manuale(50, 1);
-                printf("aaa");
             }else {
                 posizione_skip = spostamento(movimento_skip - 1, gravita.back(), posizione.back());
             }
@@ -135,19 +133,16 @@ int main(void) {
                 }
             }
 
-
-
             campo.set_casella(posizione.back().Y, posizione.back().X, input.input, TipoScritta::COLLISIONE);
 
             posizione_cursore(posizione.back());
 
             campo.stampa(posizione.back().Y, posizione.back().X);
 
-
-        skip = false;
-
+            // TELECAMERA
 
 
+            skip = false;
 
         }
 

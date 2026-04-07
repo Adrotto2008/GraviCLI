@@ -8,8 +8,14 @@
 
 /*-----------COSTANTI----------------*/
 /*------------CORDINATE---------*/
-#define MAX_Y 14 // 100
-#define MAX_X 50 // 200
+extern int MAX_Y; // 14 // 100
+extern int MAX_X; // 50 // 200
+
+extern int MAX_Y_TERMINALE; // 14 // 100
+extern int MAX_X_TERMINALE; // 50 // 200
+
+extern int TELECAMERA_Y; // 14 // 100
+extern int TELECAMERA_X; // 50 // 200
 
 /*------------COLORI------------*/
 #define RESET   "\033[0m" //

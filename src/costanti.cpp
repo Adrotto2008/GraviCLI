@@ -1,5 +1,14 @@
 #include "../include/costanti.hpp"
 
+int MAX_Y; // 14 // 100
+int MAX_X; // 50 // 200
+
+int MAX_Y_TERMINALE;
+int MAX_X_TERMINALE;
+
+int TELECAMERA_Y = 0;
+int TELECAMERA_X = 0;
+
 // inizializzo gli array contenenti gli input
 
 std::array<char, 80> CARATTERI_POSSIBILI = {

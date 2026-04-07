@@ -63,6 +63,8 @@ void nascondi_cursore();
 void mostra_cursore();
 void pulisci();
 void cmd_grande();
+short lunghezza_terminale_x();
+short lunghezza_terminale_y();
 
 #ifdef __linux__
 // --- Input ---

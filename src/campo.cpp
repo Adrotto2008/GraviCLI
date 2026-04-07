@@ -1,7 +1,42 @@
 #include "../include/campo.hpp"
-#include "../include/utilita.hpp"
 
 void Campo::carica_campo(std::string nomeFile) {
+
+    std::ifstream fp("livelli/" + nomeFile, std::ios::binary);
+    if (!fp.is_open()) {
+        printf("errore");
+        return;
+    }
+
+    auto normalizza_riga = [](std::string& riga, bool primaRiga) {
+        if (!riga.empty() && riga.back() == '\r') {
+            riga.pop_back();
+        }
+
+        if (primaRiga && riga.size() >= 3) {
+            unsigned char b0 = static_cast<unsigned char>(riga[0]);
+            unsigned char b1 = static_cast<unsigned char>(riga[1]);
+            unsigned char b2 = static_cast<unsigned char>(riga[2]);
+            if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
+                riga.erase(0, 3);
+            }
+        }
+    };
+
+    int righeLette = 0;
+    int maxColonne = 0;
+    std::string riga;
+
+    while (std::getline(fp, riga)) {
+        normalizza_riga(riga, righeLette == 0);
+        maxColonne = (std::max)(maxColonne, static_cast<int>(riga.size()));
+        righeLette++;
+    }
+
+    MAX_Y = righeLette;
+    MAX_X = (std::max)(maxColonne, 1);
+
+    caselle.assign(MAX_Y, std::vector<Casella>(MAX_X));
 
     for (int i = 0; i < MAX_Y; i++) {
         for (int j = 0; j < MAX_X; j++) {
@@ -9,43 +44,28 @@ void Campo::carica_campo(std::string nomeFile) {
         }
     }
 
-    FILE* fp = fopen(("livelli/" + nomeFile).c_str(), "rb");
-    if (!fp) {
-        printf("errore");
+    fp.clear();
+    fp.seekg(0, std::ios::beg);
+    if (!fp.good()) {
         return;
     }
 
-    char buffer[MAX_X + 4];
-
     for (int i = 0; i < MAX_Y; i++) {
-        if (!fgets(buffer, sizeof(buffer), fp)) {
+        if (!std::getline(fp, riga)) {
             break;
         }
 
-        int src = 0;
-        if (i == 0) {
-            unsigned char b0 = static_cast<unsigned char>(buffer[0]);
-            unsigned char b1 = static_cast<unsigned char>(buffer[1]);
-            unsigned char b2 = static_cast<unsigned char>(buffer[2]);
-            if (b0 == 0xEF && b1 == 0xBB && b2 == 0xBF) {
-                src = 3;
-            }
-        }
+        normalizza_riga(riga, i == 0);
 
         int j = 0;
-        for (; j < MAX_X; j++, src++) {
-            if (buffer[src] == '\0' || buffer[src] == '\n' || buffer[src] == '\r') {
-                break;
-            }
-            caselle[i][j].testo = buffer[src];
+        for (; j < MAX_X && j < static_cast<int>(riga.size()); j++) {
+            caselle[i][j].testo = riga[j];
         }
 
         for (; j < MAX_X; j++) {
             caselle[i][j].testo = ' ';
         }
     }
-
-    fclose(fp);
 }
 
 
@@ -78,6 +98,9 @@ void Campo::inizializza(){
 
 
 void Campo::stampa(short y, short x) {
+
+    y += TELECAMERA_Y;
+    x += TELECAMERA_X;
 
     controllo_colori_sfondo(caselle[y][x]);
     controllo_colori_testo(caselle[y][x]);
@@ -126,7 +149,7 @@ TipoScritta Campo::collisione(COORD posizione, GRAVITA gravita, short movimento)
         }
 
         if ((movimento == 1 || i == movimento - 1) && caselle[posizione.Y][posizione.X].tipo != TipoScritta::LIBERO) return caselle[posizione.Y][posizione.X].tipo;
-
+        if (movimento > 1 && caselle[posizione.Y][posizione.X].tipo == TipoScritta::SFONDO) return TipoScritta::SFONDO;
     }
 
 

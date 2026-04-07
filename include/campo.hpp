@@ -2,6 +2,10 @@
 #define GRAVICLI_CAMPO_H
 
 #include "costanti.hpp"
+#include "utilita.hpp"
+#include <vector>
+#include <algorithm>
+#include <fstream>
 
 struct Casella {
 
@@ -16,7 +20,7 @@ class Campo {
 
     public:
 
-        Casella caselle[MAX_Y][MAX_X];
+        std::vector<std::vector<Casella>> caselle;
 
         void carica_campo(std::string nomeFile);
         void inizializza();
