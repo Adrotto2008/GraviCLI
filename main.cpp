@@ -22,6 +22,60 @@ COORD spostamento(short movimento, GRAVITA gravita, COORD pos) {
     return pos;
 }
 
+void rimuovi_freccia(Campo campo, COORD posizione_freccia) {
+    campo.set_casella(posizione_freccia.Y, posizione_freccia.X, ' ', TipoScritta::LIBERO);
+    posizione_cursore(posizione_freccia);
+    campo.stampa(posizione_freccia.Y, posizione_freccia.X);
+}
+
+void mostra_freccia(Campo campo, COORD posizione_freccia, char carattere_freccia) {
+    campo.set_casella(posizione_freccia.Y, posizione_freccia.X, carattere_freccia, TipoScritta::LIBERO);
+    posizione_cursore(posizione_freccia);
+    campo.stampa(posizione_freccia.Y, posizione_freccia.X);
+}
+
+COORD calcola_posizione_freccia(COORD posizione, GRAVITA gravita){
+    COORD posizione_freccia = posizione;
+
+    switch (gravita) {
+        case GRAVITA::DESTRA:
+            posizione_freccia.X++;
+            break;
+
+        case GRAVITA::SINISTRA:
+            posizione_freccia.X--;
+            break;
+
+        case GRAVITA::SU:
+            posizione_freccia.Y--;
+            break;
+
+        case GRAVITA::GIU:
+            posizione_freccia.Y++;
+            break;
+    }
+
+    return posizione_freccia;
+}
+
+char calcola_carattere_freccia(GRAVITA gravita) {
+    switch (gravita) {
+        case GRAVITA::DESTRA:
+            return '>';
+
+        case GRAVITA::SINISTRA:
+            return '<';
+
+        case GRAVITA::SU:
+            return '^';
+
+        case GRAVITA::GIU:
+            return 'v';
+    }
+
+    return 0;
+}
+
 int main(void) {
 
     Campo campo;
@@ -29,13 +83,17 @@ int main(void) {
     short movimento;
     std::vector<GRAVITA> gravita;
     std::vector<COORD> posizione;
+    std::vector<COORD> posizione_cambio_gravita;
+    COORD posizione_freccia = {2, 2};
     bool skip = false;
     bool uscita = false;
     short movimento_skip = 4;
     COORD posizione_skip = {};
+    char carattere_freccia = 0;
 
     gravita.push_back(GRAVITA::DESTRA);
     posizione.push_back(COORD{2, 2});
+    posizione_cambio_gravita.push_back(COORD{2, 2});
 
     campo.carica_campo("prova.txt");
     campo.inizializza();
@@ -55,6 +113,8 @@ int main(void) {
             continue;
         }
 
+        rimuovi_freccia(campo, posizione_freccia);
+
         input.scan();
 
         movimento = 1;
@@ -64,19 +124,21 @@ int main(void) {
         if (azione == TipoInput::INVIO) {
             switch (input.comando()) {
                 case TipoComando::DESTRA:
-                    if (gravita.back() != GRAVITA::SINISTRA && gravita.back() != GRAVITA::DESTRA) gravita.push_back(GRAVITA::DESTRA);
+                    if (gravita.back() != GRAVITA::SINISTRA && gravita.back() != GRAVITA::DESTRA){ gravita.push_back(GRAVITA::DESTRA); posizione_cambio_gravita.push_back(posizione.back());
+            }
                     break;
 
                 case TipoComando::SINISTRA:
-                    if (gravita.back() != GRAVITA::DESTRA && gravita.back() != GRAVITA::SINISTRA) gravita.push_back(GRAVITA::SINISTRA);
+                    if (gravita.back() != GRAVITA::DESTRA && gravita.back() != GRAVITA::SINISTRA){ gravita.push_back(GRAVITA::SINISTRA); posizione_cambio_gravita.push_back(posizione.back());
+            }
                     break;
 
                 case TipoComando::SU:
-                    if (gravita.back() != GRAVITA::GIU && gravita.back() != GRAVITA::SU) gravita.push_back(GRAVITA::SU);
+                    if (gravita.back() != GRAVITA::GIU && gravita.back() != GRAVITA::SU){ gravita.push_back(GRAVITA::SU); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::GIU:
-                    if (gravita.back() != GRAVITA::SU && gravita.back() != GRAVITA::GIU) gravita.push_back(GRAVITA::GIU);
+                    if (gravita.back() != GRAVITA::SU && gravita.back() != GRAVITA::GIU){ gravita.push_back(GRAVITA::GIU); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::SKIP:
@@ -92,8 +154,9 @@ int main(void) {
 
                 GRAVITA g2 = static_cast<GRAVITA>((static_cast<int>(gravita.back()) + 2) % 4);
 
-                if (campo.collisione(posizione.back(), g2, movimento) == TipoScritta::LIBERO) {
+                if (posizione.back().X == posizione_cambio_gravita.back().X && posizione.back().Y == posizione_cambio_gravita.back().Y) {
                     if (gravita.size() > 1) gravita.pop_back();
+                    if (posizione_cambio_gravita.size() > 1) posizione_cambio_gravita.pop_back();
                 }
 
                 if (!input.stringa.empty()) input.stringa.pop_back();
@@ -103,6 +166,10 @@ int main(void) {
                 campo.stampa(posizione.back().Y, posizione.back().X);
 
                 posizione.pop_back();
+
+                posizione_freccia = calcola_posizione_freccia(posizione.back(), gravita.back());
+                carattere_freccia = calcola_carattere_freccia(gravita.back());
+
             }
 
         } else if (azione == TipoInput::DEBUG) {
@@ -125,7 +192,7 @@ int main(void) {
             if (skip) {//aggiusta
                 posizione.push_back(spostamento(movimento, gravita.back(), posizione_skip));
             }else {
-                if (campo.collisione(posizione.back(), gravita.back(), movimento) != TipoScritta::LIBERO) {
+                if (campo.collisione(posizione.back(), gravita.back(), movimento + 1) != TipoScritta::LIBERO) {
                     input.stringa.erase(input.stringa.length() - 2, 1);
                     //rendi rosso il carattere?
                 }else {
@@ -139,6 +206,12 @@ int main(void) {
 
             campo.stampa(posizione.back().Y, posizione.back().X);
 
+
+            // Freccia grafica di posizione
+
+            posizione_freccia = calcola_posizione_freccia(posizione.back(), gravita.back());
+            carattere_freccia = calcola_carattere_freccia(gravita.back());
+
             // TELECAMERA
 
 
@@ -146,8 +219,11 @@ int main(void) {
 
         }
 
+        mostra_freccia(campo, posizione_freccia, carattere_freccia);
+
+
         // debug della stringa
-        cursore_manuale(50, 0);
+        cursore_manuale(0, MAX_Y + 1);
         printf("stringa: %-*s", static_cast<int>(input.stringa.length()) + 1, input.stringa.c_str());
 
 

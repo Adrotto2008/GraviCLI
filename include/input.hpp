@@ -6,7 +6,7 @@
 /*------------CLASSE------------*/
 class Input {
 public:
-    std::string stringa;
+    std::string stringa = "prova";
     char input = 0;
 
     void scan();      
