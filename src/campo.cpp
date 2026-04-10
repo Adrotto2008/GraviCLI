@@ -119,9 +119,11 @@ void Campo::stampa_campo() {
     }
 }
 
-void Campo::set_casella(short y, short x, char c, TipoScritta tipo) {
+void Campo::set_casella(short y, short x, char c, TipoScritta tipo, Colore colore_sfondo, Colore colore_testo) {
     caselle[y][x].testo = c;
     caselle[y][x].tipo = tipo;
+    caselle[y][x].coloreSfondo = colore_sfondo;
+    caselle[y][x].coloreTesto = colore_testo;
 }
 
 TipoScritta Campo::collisione(COORD posizione, GRAVITA gravita, short movimento) {

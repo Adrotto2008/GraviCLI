@@ -143,7 +143,10 @@ enum class Colore {
     magenta      = -13,
     bianco       = -14,
 
-    grigio_chiaro = -15
+    grigio_chiaro = -15,
+    nero = -16,
+    reset = -17,
+    neutro = -18
 };
 
 /*------------INPUT------------*/

@@ -380,8 +380,15 @@ void controllo_colori_testo(Casella casella) {
             printf(TESTO_GRIGIO);
             break;
 
-        default:
+        case Colore::nero:
+            printf(TESTO_NERO);
+            break;
+
+        case Colore::reset:
             printf(RESET);
+            break;
+
+        default:
             break;
     }
 }
@@ -449,8 +456,15 @@ void controllo_colori_sfondo(Casella casella) {
             printf(SFONDO_GRIGIO_CHIARO);
             break;
 
-        default:
+        case Colore::nero:
+            printf(SFONDO_NERO);
+            break;
+
+        case Colore::reset:
             printf(RESET);
+            break;
+
+        default:
             break;
     }
 }

@@ -23,15 +23,14 @@ COORD spostamento(short movimento, GRAVITA gravita, COORD pos) {
 }
 
 void rimuovi_freccia(Campo campo, COORD posizione_freccia) {
-    campo.set_casella(posizione_freccia.Y, posizione_freccia.X, ' ', TipoScritta::LIBERO);
     posizione_cursore(posizione_freccia);
     campo.stampa(posizione_freccia.Y, posizione_freccia.X);
 }
 
-void mostra_freccia(Campo campo, COORD posizione_freccia, char carattere_freccia) {
-    campo.set_casella(posizione_freccia.Y, posizione_freccia.X, carattere_freccia, TipoScritta::LIBERO);
+void mostra_freccia(COORD posizione_freccia, char carattere_freccia) {
+    printf(TESTO_VERDE);
     posizione_cursore(posizione_freccia);
-    campo.stampa(posizione_freccia.Y, posizione_freccia.X);
+    printf("%c", carattere_freccia);
 }
 
 COORD calcola_posizione_freccia(COORD posizione, GRAVITA gravita){
@@ -124,13 +123,11 @@ int main(void) {
         if (azione == TipoInput::INVIO) {
             switch (input.comando()) {
                 case TipoComando::DESTRA:
-                    if (gravita.back() != GRAVITA::SINISTRA && gravita.back() != GRAVITA::DESTRA){ gravita.push_back(GRAVITA::DESTRA); posizione_cambio_gravita.push_back(posizione.back());
-            }
+                    if (gravita.back() != GRAVITA::SINISTRA && gravita.back() != GRAVITA::DESTRA){ gravita.push_back(GRAVITA::DESTRA); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::SINISTRA:
-                    if (gravita.back() != GRAVITA::DESTRA && gravita.back() != GRAVITA::SINISTRA){ gravita.push_back(GRAVITA::SINISTRA); posizione_cambio_gravita.push_back(posizione.back());
-            }
+                    if (gravita.back() != GRAVITA::DESTRA && gravita.back() != GRAVITA::SINISTRA){ gravita.push_back(GRAVITA::SINISTRA); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::SU:
@@ -161,7 +158,7 @@ int main(void) {
 
                 if (!input.stringa.empty()) input.stringa.pop_back();
 
-                campo.set_casella(posizione.back().Y, posizione.back().X, ' ', TipoScritta::LIBERO);
+                campo.set_casella(posizione.back().Y, posizione.back().X, ' ', TipoScritta::LIBERO, Colore::reset, Colore::bianco);
                 posizione_cursore(posizione.back());
                 campo.stampa(posizione.back().Y, posizione.back().X);
 
@@ -192,7 +189,7 @@ int main(void) {
             if (skip) {//aggiusta
                 posizione.push_back(spostamento(movimento, gravita.back(), posizione_skip));
             }else {
-                if (campo.collisione(posizione.back(), gravita.back(), movimento + 1) != TipoScritta::LIBERO) {
+                if (campo.collisione(posizione.back(), gravita.back(), movimento) != TipoScritta::LIBERO) {
                     input.stringa.erase(input.stringa.length() - 2, 1);
                     //rendi rosso il carattere?
                 }else {
@@ -200,17 +197,12 @@ int main(void) {
                 }
             }
 
-            campo.set_casella(posizione.back().Y, posizione.back().X, input.input, TipoScritta::COLLISIONE);
+            campo.set_casella(posizione.back().Y, posizione.back().X, input.input, TipoScritta::COLLISIONE, Colore::reset, Colore::bianco);
 
             posizione_cursore(posizione.back());
 
             campo.stampa(posizione.back().Y, posizione.back().X);
 
-
-            // Freccia grafica di posizione
-
-            posizione_freccia = calcola_posizione_freccia(posizione.back(), gravita.back());
-            carattere_freccia = calcola_carattere_freccia(gravita.back());
 
             // TELECAMERA
 
@@ -219,12 +211,23 @@ int main(void) {
 
         }
 
-        mostra_freccia(campo, posizione_freccia, carattere_freccia);
+        // Freccia grafica di posizione
+
+        posizione_freccia = calcola_posizione_freccia(posizione.back(), gravita.back());
+        carattere_freccia = calcola_carattere_freccia(gravita.back());
+
+        if (campo.caselle[posizione_freccia.Y][posizione_freccia.X].tipo == TipoScritta::LIBERO) {
+            mostra_freccia(posizione_freccia, carattere_freccia);
+        } else {
+            campo.caselle[posizione.back().Y][posizione.back().X].coloreTesto = Colore::rosso;
+            posizione_cursore(posizione.back());
+            campo.stampa(posizione.back().Y, posizione.back().X);
+        }
 
 
         // debug della stringa
-        cursore_manuale(0, MAX_Y + 1);
-        printf("stringa: %-*s", static_cast<int>(input.stringa.length()) + 1, input.stringa.c_str());
+        // cursore_manuale(0, MAX_Y + 1);
+        // printf("stringa: %-*s", static_cast<int>(input.stringa.length()) + 1, input.stringa.c_str());
 
 
 

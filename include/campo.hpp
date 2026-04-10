@@ -27,7 +27,7 @@ class Campo {
         void stampa(short y, short x);
         void stampa_campo();
 
-        void set_casella(short y, short x, char testo, TipoScritta tipo);
+        void set_casella(short y, short x, char testo, TipoScritta tipo, Colore colore_sfondo, Colore colore_testo);
         TipoScritta collisione(COORD posizione, GRAVITA gravita, short movimento);
 
 };
