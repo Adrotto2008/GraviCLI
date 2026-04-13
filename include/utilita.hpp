@@ -5,7 +5,7 @@
 
 struct Casella;
 
-#ifndef __linux__
+#if defined(_WIN32)
 
 #define WIN32_LEAN_AND_MEAN
 
@@ -45,7 +45,7 @@ struct Casella;
 void countdown_input(int tempo);
 void countdown_caduta(int tempo);
 
-// --- Terminale/Console (compatibilità Linux) ---
+// --- Terminale/Console (compatibilità POSIX) ---
 void cmd_type();
 void disabilita_echo();
 void ripristina_echo();
@@ -66,8 +66,8 @@ void cmd_grande();
 short lunghezza_terminale_x();
 short lunghezza_terminale_y();
 
-#ifdef __linux__
-// --- Input ---
+#if !defined(_WIN32)
+// --- Input POSIX ---
 int _getch();
 bool kbhit();
 #endif

@@ -84,7 +84,7 @@ extern int TELECAMERA_X; // 50 // 200
 #define SFONDO_DARK_GRAY "\033[48;5;8m"
 
 
-#ifdef __linux__
+#if !defined(_WIN32)
 // ---- Struct compatibile con COORD ----
 struct COORD {
     short X;
@@ -165,16 +165,17 @@ enum class TipoComando {
     GIU,
     SINISTRA,
     DESTRA,
-    SKIP
+    SKIP,
+    SPARO
 };
 
-#define NUMERO_COMANDI 5
+#define NUMERO_COMANDI 6
 extern const std::string COMANDI[NUMERO_COMANDI];
 
 /*-------------VARIABILI GLOBALI DI IMPOSTAZIONI-----------*/
 
 /*------------INPUT-------------*/
-extern std::array<char, 80> CARATTERI_POSSIBILI;
+extern std::array<char, 79> CARATTERI_POSSIBILI;
 extern std::array<char, 1> INVIO;
 extern std::array<char, 2> BACKSPACE;
 extern std::array<char, 1> DEBUG;

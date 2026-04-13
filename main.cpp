@@ -1,3 +1,4 @@
+#include "include/inventario.hpp"
 #include "include/input.hpp"
 #include "include/campo.hpp"
 
@@ -77,6 +78,7 @@ char calcola_carattere_freccia(GRAVITA gravita) {
 
 int main(void) {
 
+    Inventario inventario;
     Campo campo;
     Input input;
     short movimento;
@@ -123,23 +125,44 @@ int main(void) {
         if (azione == TipoInput::INVIO) {
             switch (input.comando()) {
                 case TipoComando::DESTRA:
-                    if (gravita.back() != GRAVITA::SINISTRA && gravita.back() != GRAVITA::DESTRA){ gravita.push_back(GRAVITA::DESTRA); posizione_cambio_gravita.push_back(posizione.back()); }
+                    if (inventario.destra)
+                        if (gravita.back() != GRAVITA::SINISTRA && gravita.back() != GRAVITA::DESTRA){ gravita.push_back(GRAVITA::DESTRA); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::SINISTRA:
-                    if (gravita.back() != GRAVITA::DESTRA && gravita.back() != GRAVITA::SINISTRA){ gravita.push_back(GRAVITA::SINISTRA); posizione_cambio_gravita.push_back(posizione.back()); }
+                    if (inventario.sinistra)
+                        if (gravita.back() != GRAVITA::DESTRA && gravita.back() != GRAVITA::SINISTRA){ gravita.push_back(GRAVITA::SINISTRA); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::SU:
-                    if (gravita.back() != GRAVITA::GIU && gravita.back() != GRAVITA::SU){ gravita.push_back(GRAVITA::SU); posizione_cambio_gravita.push_back(posizione.back()); }
+                    if (inventario.su)
+                        if (gravita.back() != GRAVITA::GIU && gravita.back() != GRAVITA::SU){ gravita.push_back(GRAVITA::SU); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::GIU:
-                    if (gravita.back() != GRAVITA::SU && gravita.back() != GRAVITA::GIU){ gravita.push_back(GRAVITA::GIU); posizione_cambio_gravita.push_back(posizione.back()); }
+                    if (inventario.giu)
+                        if (gravita.back() != GRAVITA::SU && gravita.back() != GRAVITA::GIU){ gravita.push_back(GRAVITA::GIU); posizione_cambio_gravita.push_back(posizione.back()); }
                     break;
 
                 case TipoComando::SKIP:
-                    skip = true;
+                    if (inventario.skip)
+                        skip = true;
+                    break;
+
+                case TipoComando::SPARO:
+                    if (inventario.proiettili > 0) {
+                        inventario.proiettili--;
+                        for (int i = 1; i < 5; i++) {
+                            if (campo.collisione(posizione.back(), gravita.back(), i) == TipoScritta::COLLISIONE) {
+                                COORD pos = spostamento(i, gravita.back(), posizione.back());
+                                campo.set_casella(pos.Y, pos.X, ' ', TipoScritta::LIBERO, Colore::reset, Colore::bianco);
+                                posizione_cursore(pos);
+                                campo.stampa(pos.Y, pos.X);
+                                // suono
+                                break;
+                            }
+                        }
+                    }
                     break;
 
                 default:
@@ -197,6 +220,12 @@ int main(void) {
                 }
             }
 
+            // controllo ottenuta proiettile
+
+            if (campo.caselle[posizione.back().Y][posizione.back().X].testo == '.') {
+                inventario.proiettili++;
+            }
+
             campo.set_casella(posizione.back().Y, posizione.back().X, input.input, TipoScritta::COLLISIONE, Colore::reset, Colore::bianco);
 
             posizione_cursore(posizione.back());
@@ -225,10 +254,14 @@ int main(void) {
         }
 
 
+
+
         // debug della stringa
         // cursore_manuale(0, MAX_Y + 1);
         // printf("stringa: %-*s", static_cast<int>(input.stringa.length()) + 1, input.stringa.c_str());
-
+        // debug dei proiettili
+        cursore_manuale(0, MAX_Y + 2);
+        printf("proiettili: %d", inventario.proiettili);
 
 
 

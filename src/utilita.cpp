@@ -1,7 +1,7 @@
 #include "../include/utilita.hpp"
 #include "../include/campo.hpp"
 
-#ifdef __linux__
+#if !defined(_WIN32)
 #include <sys/ioctl.h>
 #endif
 
@@ -15,7 +15,7 @@ int timer_caduta;
 int timer_caduta_origine = 300;
 int timer_scambio = 15000;
 
-#ifdef __linux__
+#if !defined(_WIN32)
 termios term_originale;
 
 // ---------------- Console ----------------
@@ -104,7 +104,7 @@ bool kbhit() {
 }
 #else
 
-// ---------------- Terminale/Console (compatibilità Linux) ----------------
+// ---------------- Terminale/Console (compatibilità POSIX) ----------------
 
 void cmd_type(){
     // Imposta la console a UTF-8 (SOLO la code page)
@@ -213,7 +213,7 @@ void countdown_caduta(int tempo) {
 #endif
 
 short lunghezza_terminale_x() {
-#ifdef __linux__
+#if !defined(_WIN32)
     winsize ws{};
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_col > 0) {
         return static_cast<short>(ws.ws_col);
@@ -247,7 +247,7 @@ short lunghezza_terminale_x() {
 }
 
 short lunghezza_terminale_y() {
-#ifdef __linux__
+#if !defined(_WIN32)
     winsize ws{};
     if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == 0 && ws.ws_row > 0) {
         return static_cast<short>(ws.ws_row);

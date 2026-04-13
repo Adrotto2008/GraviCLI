@@ -7,7 +7,7 @@
 void Input::scan(){
     input = 0;
     input = _getch();
-    #ifdef __linux__
+    #if !defined(_WIN32)
     if (input == 27){
 
         if (kbhit()){

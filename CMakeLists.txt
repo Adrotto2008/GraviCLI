@@ -17,7 +17,8 @@ set(SFML_BUILD_AUDIO ON CACHE BOOL "" FORCE)
 
 add_subdirectory(SFML)
 
-add_executable(GraviCLI ${SOURCES})
+add_executable(GraviCLI ${SOURCES}
+        src/inventario.cpp)
 
 target_include_directories(GraviCLI PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/include
