@@ -2,7 +2,37 @@
 #include "include/input.hpp"
 #include "include/campo.hpp"
 
-COORD spostamento(short movimento, GRAVITA gravita, COORD pos) {
+COORD posizione_iniziale_livelli(std::string livello)
+{
+    COORD posizione_iniziale = {0, 0};
+
+    if (livello == "livello1.txt") {
+        posizione_iniziale = {2, 2};
+    } else if (livello == "livello2.txt") {
+        posizione_iniziale = {2, 2};
+    } else if (livello == "livello3.txt") {
+        posizione_iniziale = {2, 2};
+    } else if (livello == "livello4.txt") {
+        posizione_iniziale = {2, 2};
+    } else if (livello == "livello5.txt") {
+        posizione_iniziale = {2, 1};
+    } else if (livello == "livello6.txt") {
+        posizione_iniziale = {2, 2};
+    } else if (livello == "livello7.txt") {
+        posizione_iniziale = {2, 2};
+    } else if (livello == "livello8.txt") {
+        posizione_iniziale = {2, 2};
+    } else if (livello == "livello9.txt") {
+        posizione_iniziale = {2, 2};
+    } else
+    {
+        posizione_iniziale = {2, 2};
+    }
+
+    return posizione_iniziale;
+}
+
+COORD spostamento(const short movimento, const GRAVITA gravita, COORD pos) {
     switch (gravita) {
         case GRAVITA::DESTRA:
             pos.X += movimento;
@@ -28,13 +58,13 @@ void rimuovi_freccia(Campo campo, COORD posizione_freccia) {
     campo.stampa(posizione_freccia.Y, posizione_freccia.X);
 }
 
-void mostra_freccia(COORD posizione_freccia, char carattere_freccia) {
+void mostra_freccia(COORD posizione_freccia, const char carattere_freccia) {
     printf(TESTO_VERDE);
     posizione_cursore(posizione_freccia);
     printf("%c", carattere_freccia);
 }
 
-COORD calcola_posizione_freccia(COORD posizione, GRAVITA gravita){
+COORD calcola_posizione_freccia(const COORD posizione, GRAVITA gravita){
     COORD posizione_freccia = posizione;
 
     switch (gravita) {
@@ -76,7 +106,7 @@ char calcola_carattere_freccia(GRAVITA gravita) {
     return 0;
 }
 
-int main(void) {
+int main(int argc, char* argv[]) {
 
     Inventario inventario;
     Campo campo;
@@ -85,7 +115,15 @@ int main(void) {
     std::vector<GRAVITA> gravita;
     std::vector<COORD> posizione;
     std::vector<COORD> posizione_cambio_gravita;
-    COORD posizione_freccia = {2, 2};
+    std::string livello;
+    if (argc == 2)
+    {
+        livello = argv[1];
+    } else
+    {
+        livello = "livello2.txt";
+    }
+    COORD posizione_freccia = posizione_iniziale_livelli(livello);
     bool skip = false;
     bool uscita = false;
     short movimento_skip = 4;
@@ -93,10 +131,10 @@ int main(void) {
     char carattere_freccia = 0;
 
     gravita.push_back(GRAVITA::DESTRA);
-    posizione.push_back(COORD{2, 2});
-    posizione_cambio_gravita.push_back(COORD{2, 2});
+    posizione.push_back(posizione_freccia);
+    posizione_cambio_gravita.push_back(posizione_freccia);
 
-    campo.carica_campo("prova.txt");
+    campo.carica_campo(livello);
     campo.inizializza();
 
     pulisci();
@@ -148,49 +186,52 @@ int main(void) {
                     if (inventario.skip)
                         skip = true;
                     break;
-
                 case TipoComando::SPARO:
-                    if (inventario.proiettili > 0) {
-                        inventario.proiettili--;
-                        for (int i = 1; i < 5; i++) {
-                            if (campo.collisione(posizione.back(), gravita.back(), i) == TipoScritta::COLLISIONE) {
-                                COORD pos = spostamento(i, gravita.back(), posizione.back());
-                                campo.set_casella(pos.Y, pos.X, ' ', TipoScritta::LIBERO, Colore::reset, Colore::bianco);
-                                posizione_cursore(pos);
-                                campo.stampa(pos.Y, pos.X);
-                                // suono
-                                break;
-                            }
-                        }
+                    if (inventario.proiettili == 0)
+                        break;
+
+                    inventario.proiettili--;
+                    for (short i = 1; i < 5; i++) {
+                        if (campo.collisione(posizione.back(), gravita.back(), i) != TipoScritta::COLLISIONE)
+                            continue;
+
+                        COORD pos = spostamento(i, gravita.back(), posizione.back());
+                        campo.set_casella(pos.Y, pos.X, ' ', TipoScritta::LIBERO, Colore::reset, Colore::bianco);
+                        posizione_cursore(pos);
+                        campo.stampa(pos.Y, pos.X);
+                        // suono
+                        break;
+
                     }
+
                     break;
+
 
                 default:
                     break;
             }
         } else if (azione == TipoInput::BACKSPACE) {
 
-            if (posizione.size() > 1) {
+            if (posizione.size() == 1)
+                continue;
 
-                GRAVITA g2 = static_cast<GRAVITA>((static_cast<int>(gravita.back()) + 2) % 4);
-
-                if (posizione.back().X == posizione_cambio_gravita.back().X && posizione.back().Y == posizione_cambio_gravita.back().Y) {
-                    if (gravita.size() > 1) gravita.pop_back();
-                    if (posizione_cambio_gravita.size() > 1) posizione_cambio_gravita.pop_back();
-                }
-
-                if (!input.stringa.empty()) input.stringa.pop_back();
-
-                campo.set_casella(posizione.back().Y, posizione.back().X, ' ', TipoScritta::LIBERO, Colore::reset, Colore::bianco);
-                posizione_cursore(posizione.back());
-                campo.stampa(posizione.back().Y, posizione.back().X);
-
-                posizione.pop_back();
-
-                posizione_freccia = calcola_posizione_freccia(posizione.back(), gravita.back());
-                carattere_freccia = calcola_carattere_freccia(gravita.back());
-
+            if (posizione.back().X == posizione_cambio_gravita.back().X && posizione.back().Y == posizione_cambio_gravita.back().Y) {
+                if (gravita.size() > 1) gravita.pop_back();
+                if (posizione_cambio_gravita.size() > 1) posizione_cambio_gravita.pop_back();
             }
+
+            if (!input.stringa.empty()) input.stringa.pop_back();
+
+            campo.set_casella(posizione.back().Y, posizione.back().X, ' ', TipoScritta::LIBERO, Colore::reset, Colore::bianco);
+            posizione_cursore(posizione.back());
+            campo.stampa(posizione.back().Y, posizione.back().X);
+
+            posizione.pop_back();
+
+            posizione_freccia = calcola_posizione_freccia(posizione.back(), gravita.back());
+            carattere_freccia = calcola_carattere_freccia(gravita.back());
+
+
 
         } else if (azione == TipoInput::DEBUG) {
             campo.stampa_campo();
@@ -224,6 +265,12 @@ int main(void) {
 
             if (campo.caselle[posizione.back().Y][posizione.back().X].testo == '.') {
                 inventario.proiettili++;
+            }
+
+            // CONDIZIONE USCITA
+
+            if (campo.caselle[posizione.back().Y][posizione.back().X].testo == '!'){
+                uscita = true;
             }
 
             campo.set_casella(posizione.back().Y, posizione.back().X, input.input, TipoScritta::COLLISIONE, Colore::reset, Colore::bianco);

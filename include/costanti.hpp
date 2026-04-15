@@ -175,7 +175,7 @@ extern const std::string COMANDI[NUMERO_COMANDI];
 /*-------------VARIABILI GLOBALI DI IMPOSTAZIONI-----------*/
 
 /*------------INPUT-------------*/
-extern std::array<char, 79> CARATTERI_POSSIBILI;
+extern std::array<char, 78> CARATTERI_POSSIBILI;
 extern std::array<char, 1> INVIO;
 extern std::array<char, 2> BACKSPACE;
 extern std::array<char, 1> DEBUG;

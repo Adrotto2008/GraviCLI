@@ -4,6 +4,8 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG="${1:-Debug}"
+LEVEL="${2:-}"
+
 UNAME_S="$(uname -s)"
 case "$UNAME_S" in
 	Linux)
@@ -40,4 +42,8 @@ elif [[ -f "$BUILD_DIR/GraviCLI.exe" ]]; then
 fi
 
 echo "===== AVVIO PROGRAMMA ($EXECUTABLE) ====="
-"$EXECUTABLE"
+if [[ -n "$LEVEL" ]]; then
+  "$EXECUTABLE" "$LEVEL"
+else
+  "$EXECUTABLE"
+fi

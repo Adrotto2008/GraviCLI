@@ -79,7 +79,7 @@ void Campo::inizializza(){
 
     for(int i = 0; i < MAX_Y; i++){
         for(int j = 0; j < MAX_X; j++){
-            if(caselle[i][j].testo == ' ' || caselle[i][j].testo == '.'){
+            if(caselle[i][j].testo == ' ' || caselle[i][j].testo == '.' || caselle[i][j].testo == '!'){
                 caselle[i][j].tipo = TipoScritta::LIBERO;
                 caselle[i][j].coloreTesto = Colore::bianco;
             } else if(caselle[i][j].testo == '#'){
